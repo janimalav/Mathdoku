@@ -4,12 +4,16 @@ import java.util.Collections;
 import java.util.HashMap;
 
 public class Grid {
+    //counter for number of attempts
     int counter=0;
     private int[][] grid;
     private int dim;
+    //operator hashmap
     HashMap<String,String[]> opGroup= new HashMap<>();
+    //cell group hashmap
     HashMap<String, ArrayList<int[]>> cellGroup= new HashMap<>();
 
+    //parameterised constructor
     Grid(int dim,HashMap<String,String[]> operatorGroup,HashMap<String,ArrayList<int[]>> clGroup)
     {
         this.dim=dim;
@@ -17,6 +21,20 @@ public class Grid {
         opGroup.putAll(operatorGroup);
         cellGroup.putAll(clGroup);
     }
+
+    //getter for grid
+    public int[][] getGrid() {
+        return grid;
+    }
+
+    //getter for dimension
+    public int getDim() {
+        return dim;
+    }
+
+    /*This method will initialize all the cell of grid to 0
+    * and also it will assign the value of = operator to the grid
+    * After that it will call the solveMathDoku method*/
     boolean init()
     {
         for(int i=0;i<dim;i++)
@@ -48,6 +66,8 @@ public class Grid {
             return false;
         }
     }
+
+    /*Method for printing the grid*/
     void printGrid()
     {
         for(int i=0;i<dim;i++)
@@ -61,9 +81,9 @@ public class Grid {
         }
     }
 
+    /*method to check if the number exist in the row or not*/
     private ArrayList<Integer> isInRow(int row)
     {
-
         ArrayList<Integer> rowExist= new ArrayList<>();
         ArrayList<Integer> rowMissing= new ArrayList<>();
         for(int i=0;i<dim;i++)
@@ -83,6 +103,7 @@ public class Grid {
         return rowMissing;
     }
 
+    /*method to check if the number exist in the column or not*/
     private ArrayList isInCol(int col)
     {
         ArrayList<Integer> colExist= new ArrayList<>();
@@ -104,6 +125,7 @@ public class Grid {
         return colMissing;
     }
 
+    /*This ,method will return the arraylist of numbers which can be entered after checking the row and column*/
     private ArrayList<Integer> canEnter(int row, int col)
     {
        ArrayList<Integer> columns= isInCol(col);
@@ -120,6 +142,7 @@ public class Grid {
        return common;
     }
 
+    /*This method will return minimun group and which is still to be filled with value*/
     private ArrayList<int[]> solveGroup(int[][] matrix) {
         int min=Integer.MAX_VALUE;
         ArrayList<int[]> cellNumbers = new ArrayList<>();
@@ -138,42 +161,13 @@ public class Grid {
                 }
             }
         }
-
         return cellNumbers;
-//        for (int i = 2; i <= max; i++)
-//        {
-//            for (String key : cellGroup.keySet())
-//            {
-//                ArrayList<int[]> cellNumbers = new ArrayList<>();
-//                if (cellGroup.get(key).size() == i)
-//                {
-//                    int result = Integer.parseInt(opGroup.get(key)[0]);
-//                    char operator = opGroup.get(key)[1].charAt(0);
-//                    for (int j = 0; j < i; j++)
-//                    {
-//                        int[] y = cellGroup.get(key).get(j);
-//                        int row = y[0];
-//                        int column = y[1];
-//                        cellNumbers.add(y);
-//                    }
-//                }
-//                int count=0;
-//                for(int[] x:cellNumbers)
-//                {
-//                    if(matrix[x[0]][x[1]]!=0)
-//                    {
-//                        count++;
-//                    }
-//                }
-//                if(count!=cellNumbers.size())
-//                {
-//                    return cellNumbers;
-//                }
-//            }
-//        }
-//        return null;
     }
 
+    /*This is the important method for solving the puzzle and it will be called recursively
+     This method will solve the puzzle group wise starting from the smallest group
+      After the group is assigned with some value it will check the operator and the result of group
+       If the numbers satisfy the need it will be stored in grid */
     public boolean solveMathDoku(int[][] matrix)
     {
         ArrayList<int[]> cellNumber=solveGroup(matrix);
@@ -214,6 +208,9 @@ public class Grid {
         return true;
     }
 
+    /*The method will go group wise and will apply to operation if the group is completely filled with the number
+    * It will return false if the group is empty
+    * and will return true is the given numbers satisfies the operation*/
     private boolean checkCurrentMatrix(int[][] matrix)
     {
         int max=2;
@@ -229,7 +226,13 @@ public class Grid {
                 if(cellGroup.get(key).size()==i)
                 {
                     ArrayList<Integer> cellNumbers=new ArrayList<>();
-                    int result=Integer.parseInt(opGroup.get(key)[0]);
+                   int result;
+                    try {
+                       result=Integer.parseInt(opGroup.get(key)[0]);
+                   }
+                   catch (Exception e){
+                       return false;
+                   }
                     char operator=opGroup.get(key)[1].charAt(0);
 
                     for(int j=0;j<i;j++)
@@ -278,7 +281,8 @@ public class Grid {
         return true;
     }
 
-    boolean checkGroupExist(ArrayList<Integer> cellNumbers)
+    /*This will check if the group has any unassigned value or not*/
+    private boolean checkGroupExist(ArrayList<Integer> cellNumbers)
     {
         for(int x:cellNumbers)
         {
@@ -289,7 +293,8 @@ public class Grid {
         }
         return true;
     }
-    boolean add(int result,ArrayList<Integer> numbers)
+    //method to add numbers of group
+    private boolean add(int result,ArrayList<Integer> numbers)
     {
         int sum=0;
         for(int x:numbers)
@@ -302,8 +307,8 @@ public class Grid {
         }
         return false;
     }
-
-    boolean sub(int result,ArrayList<Integer> numbers)
+    //method to subtracting numbers of group
+    private boolean sub(int result,ArrayList<Integer> numbers)
     {
         Collections.sort(numbers,Collections.reverseOrder());
         int sub=numbers.get(0);
@@ -317,7 +322,8 @@ public class Grid {
         }
         return false;
     }
-    boolean mul(int result,ArrayList<Integer> numbers)
+    //method to multiplication numbers of group
+    private boolean mul(int result,ArrayList<Integer> numbers)
     {
         int mul=1;
         for(int x:numbers)
@@ -330,7 +336,8 @@ public class Grid {
         }
         return false;
     }
-    boolean div(int result,ArrayList<Integer> numbers)
+    //method to division numbers of group
+    private boolean div(int result,ArrayList<Integer> numbers)
     {
         Collections.sort(numbers,Collections.reverseOrder());
         int div=numbers.get(0);
