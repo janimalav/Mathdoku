@@ -9,12 +9,12 @@ public class Grid {
     private int[][] grid;
     private int dim;
     //operator hashmap
-    HashMap<String,String[]> opGroup= new HashMap<>();
+    HashMap<String,String[]> opGroup= new HashMap<String,String[]>();
     //cell group hashmap
-    HashMap<String, ArrayList<int[]>> cellGroup= new HashMap<>();
+    HashMap<String, ArrayList<int[]>> cellGroup= new HashMap<String, ArrayList<int[]>>();
 
     //parameterised constructor
-    Grid(int dim,HashMap<String,String[]> operatorGroup,HashMap<String,ArrayList<int[]>> clGroup)
+    Grid(int dim,HashMap<String,String[]> operatorGroup,HashMap<String,ArrayList<int[]>>clGroup)
     {
         this.dim=dim;
         grid=new int[dim][dim];
@@ -37,6 +37,7 @@ public class Grid {
     * After that it will call the solveMathDoku method*/
     boolean init()
     {
+        //initialising grid with 0
         for(int i=0;i<dim;i++)
         {
             for (int j=0;j<dim;j++)
@@ -45,6 +46,8 @@ public class Grid {
             }
 
         }
+
+        //all the equal sign operators will be assigned with the numbers
          for(String key:cellGroup.keySet())
         {
          if(cellGroup.get(key).size()==1)
@@ -57,9 +60,10 @@ public class Grid {
              catch (Exception e){return false;}
          }
         }
+
+        //calling solve method
         if(solveMathDoku(grid))
         {
-           // printGrid();
             return true;
         }
         else {
@@ -84,8 +88,9 @@ public class Grid {
     /*method to check if the number exist in the row or not*/
     private ArrayList<Integer> isInRow(int row)
     {
-        ArrayList<Integer> rowExist= new ArrayList<>();
-        ArrayList<Integer> rowMissing= new ArrayList<>();
+        ArrayList<Integer> rowExist= new ArrayList<Integer>();
+        ArrayList<Integer> rowMissing= new ArrayList<Integer>();
+        //loop to find the existing number in row
         for(int i=0;i<dim;i++)
         {
             if(grid[row][i]!=0)
@@ -93,6 +98,7 @@ public class Grid {
                rowExist.add(grid[row][i]);
             }
         }
+        //loop will make all the missing number in list
         for(int i=1;i<=dim;i++)
         {
             if(!rowExist.contains(i))
@@ -104,10 +110,11 @@ public class Grid {
     }
 
     /*method to check if the number exist in the column or not*/
-    private ArrayList isInCol(int col)
+    private ArrayList<Integer> isInCol(int col)
     {
-        ArrayList<Integer> colExist= new ArrayList<>();
-        ArrayList<Integer> colMissing= new ArrayList<>();
+        ArrayList<Integer> colExist= new ArrayList<Integer>();
+        ArrayList<Integer> colMissing= new ArrayList<Integer>();
+        //loop to find the existing number in column
         for(int i=0;i<dim;i++)
         {
             if(grid[i][col]!=0)
@@ -115,6 +122,7 @@ public class Grid {
                 colExist.add(grid[i][col]);
             }
         }
+        //loop will make all the missing number in list
         for(int i=1;i<=dim;i++)
         {
             if(!colExist.contains(i))
@@ -128,10 +136,11 @@ public class Grid {
     /*This ,method will return the arraylist of numbers which can be entered after checking the row and column*/
     private ArrayList<Integer> canEnter(int row, int col)
     {
+       //all the remaining numbers in column and row will be collected using two methods
        ArrayList<Integer> columns= isInCol(col);
        ArrayList<Integer> rows= isInRow(row);
 
-       ArrayList<Integer> common= new ArrayList<>();
+       ArrayList<Integer> common= new ArrayList<Integer>();
        for(int x:columns)
        {
            if(rows.contains(x))
@@ -145,7 +154,8 @@ public class Grid {
     /*This method will return minimun group and which is still to be filled with value*/
     private ArrayList<int[]> solveGroup(int[][] matrix) {
         int min=Integer.MAX_VALUE;
-        ArrayList<int[]> cellNumbers = new ArrayList<>();
+        ArrayList<int[]> cellNumbers = new ArrayList<int[]>();
+        //loop will make a list of index of group having lowest cell
         for(String key:cellGroup.keySet())
         {
             if(cellGroup.get(key).size()<min)
@@ -168,13 +178,15 @@ public class Grid {
      This method will solve the puzzle group wise starting from the smallest group
       After the group is assigned with some value it will check the operator and the result of group
        If the numbers satisfy the need it will be stored in grid */
-    public boolean solveMathDoku(int[][] matrix)
-    {
+     public boolean solveMathDoku(int[][] matrix)
+     {
+        //collect the data of particular cell into list using method
         ArrayList<int[]> cellNumber=solveGroup(matrix);
         if(cellNumber.size()==0)
         {
             return true;
         }
+
         for(int[] x:cellNumber)
         {
             int row=x[0];
@@ -182,23 +194,29 @@ public class Grid {
 
                 if(matrix[row][col]==0)
                 {
+                    //entering the possible values to the group
                     for(int possible : canEnter(row,col))
                     {
 
                         matrix[row][col] = possible;
 
+                        //checking whether the values entered servers the constrain or not by calling the method
                         if(checkCurrentMatrix(matrix))
                         {
+
+                            //copying the group and whole matrix if the value servers the constrain
                             int[][] temp = new int[dim][dim];
                             for(int r=0;r<dim;r++) {
                                 temp[r] = Arrays.copyOf(matrix[r], dim);
                             }
-                            if(solveMathDoku(matrix))
-                                return true;
 
+                            if(solveMathDoku(matrix)) {
+                                return true;
+                            }
+                            counter++;
+                            //if the value doesn't satisfy the constrain it will be set to initial value
                             for(int r=0;r<dim;r++)
                             {   matrix[r] = Arrays.copyOf(temp[r],dim);}
-                            counter++;
                         }
                         matrix[row][col] =0;
                     }
@@ -214,18 +232,20 @@ public class Grid {
     private boolean checkCurrentMatrix(int[][] matrix)
     {
         int max=2;
+        //getting the max size amongst all groups
         for(String key:cellGroup.keySet()) {
             if (cellGroup.get(key).size() > max) {
                 max = cellGroup.get(key).size();
             }
         }
+        //loop will find the filled group and operate it according to constrains and if the constrain is satisfied using that value will return true
         for(int i=2;i<=max;i++)
         {
             for(String key:cellGroup.keySet())
             {
                 if(cellGroup.get(key).size()==i)
                 {
-                    ArrayList<Integer> cellNumbers=new ArrayList<>();
+                    ArrayList<Integer> cellNumbers=new ArrayList<Integer>();
                    int result;
                     try {
                        result=Integer.parseInt(opGroup.get(key)[0]);
@@ -246,6 +266,8 @@ public class Grid {
                     {
                         break;
                     }
+
+                    //switch will work according to the given operator of the group and will call the method accordingly
                     switch (operator)
                     { case '+':
                         if(!add(result,cellNumbers))

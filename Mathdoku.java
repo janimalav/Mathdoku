@@ -17,8 +17,14 @@ public class Mathdoku {
     //list to store the stream data
     private List<String> list = new ArrayList<>();
 
+    //flags for different methods
+    private boolean loadPuzzle=false;
+    private boolean readyToSolve=false;
+    private boolean solved=false;
+
     //object of grid class
     Grid gd;
+    char[][] grid;
 
     /*This method will take a bufferedReader stream from the main method
     The stream will be converted to list
@@ -29,7 +35,6 @@ public class Mathdoku {
     {
         try
         {
-
             int count=0;
             String line=null;
             //copying all the data of stream to list
@@ -39,11 +44,13 @@ public class Mathdoku {
                 {
                     list.add(line);
                 }
+                else if(line.isEmpty() || line.trim().equals(""))
+                {
+                }
                 else {
                     count++;
                     list.add(line.replaceAll(" +",""));
                 }
-
             }
             //removing all the empty data from list
             list.removeAll(Arrays.asList(" ",null,""));
@@ -58,6 +65,7 @@ public class Mathdoku {
             //it will return true if the puzzle is loaded and cellgroup and operators are entered
             if(makecell && opGrp)
             {
+                loadPuzzle=true;
                 return true;
             }
             else {return false;}
@@ -77,6 +85,7 @@ public class Mathdoku {
     {
         try {
             //making the matrix
+            grid=new char[dim][dim];
             char[][] matrix = new char[dim][dim];
             for (int i = 0; i < dim; i++) {
                 for (int j = 0; j < dim; j++)
@@ -87,6 +96,7 @@ public class Mathdoku {
                     }
                     //entering the data into matrix
                     matrix[i][j] = list.get(i).charAt(j);
+                    grid[i][j]= list.get(i).charAt(j);
                 }
             }
 
@@ -103,6 +113,7 @@ public class Mathdoku {
                 }
                 cellGroup.put(key, temp);
             }
+
             return true;
         }
         catch (Exception e)
@@ -127,6 +138,11 @@ public class Mathdoku {
                 String[] arrCopy = new String[2];
                 arrCopy[0] = arr[1];
                 arrCopy[1] = arr[2];
+                if(operatorGroup.containsKey(arr[0]))
+                {
+                    return false;
+
+                }
                 operatorGroup.put(arr[0], arrCopy);
             }
             return true;
@@ -145,6 +161,10 @@ public class Mathdoku {
     */
     boolean readyToSolve()
     {
+        if(!loadPuzzle)
+        {
+            return false;
+        }
         //array of the operator that will be used
         char[] match={'+','-','*','/','=','–'};
         int count=0;
@@ -179,6 +199,7 @@ public class Mathdoku {
         {
             return false;
         }
+        readyToSolve=true;
         return true;
     }
 
@@ -212,6 +233,21 @@ public class Mathdoku {
             }
             if (operatorGroup.size() != smyCount.size()) {
                 return false;
+            }
+            for(String key:operatorGroup.keySet())
+            {
+                int check;
+                try {
+                   check=Integer.parseInt(operatorGroup.get(key)[0]);
+                }
+                catch (Exception e)
+                {
+                    return false;
+                }
+                if(check==0)
+                {
+                    return false;
+                }
             }
         return true;
         }
@@ -251,6 +287,10 @@ public class Mathdoku {
     Here the method will check if the solution is appropriate or not and return the value accordingly*/
     public boolean solve()
     {
+        if(!loadPuzzle || !readyToSolve)
+        {
+            return false;
+        }
         try {
             int dim= list.get(0).length();
             //intializing the object and pasing data to another class
@@ -269,6 +309,7 @@ public class Mathdoku {
                         }
                     }
                 }
+                solved=true;
                 return true;
             }
             else{
@@ -284,8 +325,23 @@ public class Mathdoku {
     }
 
     /*This method will retrieve the grid from another class and store the grid in the string and will return the string if the grid is proper*/
-    String print()
+     public String print()
     {
+        if(!loadPuzzle)
+        {
+            return null;
+        }
+        if(!solved) {
+            int dim= list.get(0).length();
+            String toPrint="";
+            for (int i = 0; i < dim; i++) {
+                for (int j = 0; j < dim; j++) {
+                    toPrint+=grid[i][j];
+                }
+                toPrint+="\n";
+            }
+            return toPrint;
+        }
         try {
             String toPrint="";
             //getting the grid
@@ -297,10 +353,10 @@ public class Mathdoku {
                 {
                     if(printMatrix[i][j]==0)
                     {
-                        return null;
+                        toPrint+=grid[i][j];
                     }
                     //assigning the data to string
-                    toPrint+=printMatrix[i][j];
+                    else {toPrint+=printMatrix[i][j];}
                 }
                 toPrint+="\n";
             }
@@ -316,18 +372,18 @@ public class Mathdoku {
     int choices()
     {
         try{
-            //checking the solution is proper or not
-            int[][] checkMatrix=gd.getGrid();
-            for(int i=0;i<gd.getDim();i++)
-            {
-                for(int j=0;j<gd.getDim();j++)
-                {
-                    if(checkMatrix[i][j]==0)
-                    {
-                        return 0;
-                    }
-                }
-            }
+//            //checking the solution is proper or not
+//            int[][] checkMatrix=gd.getGrid();
+//            for(int i=0;i<gd.getDim();i++)
+//            {
+//                for(int j=0;j<gd.getDim();j++)
+//                {
+//                    if(checkMatrix[i][j]==0)
+//                    {
+//                        return 0;
+//                    }
+//                }
+//            }
             return gd.counter;
         }
         catch (Exception e)
