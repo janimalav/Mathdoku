@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class Mathdoku {
     //This will store group id as key and all the positions of group in array list of integer array
@@ -44,7 +43,7 @@ public class Mathdoku {
                 {
                     list.add(line);
                 }
-                else if(line.isEmpty() || line.trim().equals(""))
+                else if(line.trim().equals(""))
                 {
                 }
                 else {
@@ -61,7 +60,6 @@ public class Mathdoku {
             }
             boolean opGrp=makeOperatorGroup(dim);
             boolean makecell=makeCell(dim);
-
             //it will return true if the puzzle is loaded and cellgroup and operators are entered
             if(makecell && opGrp)
             {
@@ -69,6 +67,7 @@ public class Mathdoku {
                 return true;
             }
             else {return false;}
+
         }
         catch (Exception e)
         {
@@ -76,11 +75,9 @@ public class Mathdoku {
         }
     }
 
-    /*
-    This method will be entering the value of index of the group in the hashmap
+    /*This method will be entering the value of index of the group in the hashmap
     If the dimensions will not match the given data it will return false
-    And if the cells are made it will return true
-    */
+    And if the cells are made it will return true*/
     private boolean makeCell(int dim)
     {
         try {
@@ -157,8 +154,7 @@ public class Mathdoku {
     /*This method will be returning true if the puzzle is ready to solve
     First it will check weather the given operators matches the required operator or not
     Then it will check if and given group is missing in provided operators
-    Other than this multiple methods are used to check the puzzle
-    */
+    Other than this multiple methods are used to check the puzzle*/
     boolean readyToSolve()
     {
         if(!loadPuzzle)
@@ -171,7 +167,12 @@ public class Mathdoku {
         for(String key:operatorGroup.keySet())
         {
             //try parsing the result to integer
-            try{Integer.parseInt(operatorGroup.get(key)[0]);}
+            try{
+                if(Integer.parseInt(operatorGroup.get(key)[0])<=0)
+                {
+                    return false;
+                }
+            }
             catch (NumberFormatException e){return false;}
 
             for(int i=0;i<match.length;i++)
@@ -264,6 +265,13 @@ public class Mathdoku {
             int dim=list.get(0).length();
             for(String x: operatorGroup.keySet())
             {
+                if(operatorGroup.get(x)[1].equals("="))
+                {
+                    if(cellGroup.get(x).size()>1)
+                    {
+                        return false;
+                    }
+                }
                 if(operatorGroup.get(x)[1].equals("-") || operatorGroup.get(x)[1].equals("–") || operatorGroup.get(x)[1].equals("/"))
                 {
                     //checking if the given operator servers the condition or not
@@ -271,6 +279,15 @@ public class Mathdoku {
                     {
                         return false;
                     }
+                    if(cellGroup.get(x).size()>2)
+                    {
+                        return false;
+                    }
+                    else if(cellGroup.get(x).size()==1)
+                    {
+                        return false;
+                    }
+
                 }
             }
             return true;
@@ -372,18 +389,6 @@ public class Mathdoku {
     int choices()
     {
         try{
-//            //checking the solution is proper or not
-//            int[][] checkMatrix=gd.getGrid();
-//            for(int i=0;i<gd.getDim();i++)
-//            {
-//                for(int j=0;j<gd.getDim();j++)
-//                {
-//                    if(checkMatrix[i][j]==0)
-//                    {
-//                        return 0;
-//                    }
-//                }
-//            }
             return gd.counter;
         }
         catch (Exception e)

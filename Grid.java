@@ -8,9 +8,9 @@ public class Grid {
     int counter=0;
     private int[][] grid;
     private int dim;
-    //operator hashmap
+    //operator hash map
     HashMap<String,String[]> opGroup= new HashMap<String,String[]>();
-    //cell group hashmap
+    //cell group hash map
     HashMap<String, ArrayList<int[]>> cellGroup= new HashMap<String, ArrayList<int[]>>();
 
     //parameterised constructor
@@ -71,20 +71,6 @@ public class Grid {
         }
     }
 
-    /*Method for printing the grid*/
-    void printGrid()
-    {
-        for(int i=0;i<dim;i++)
-        {
-            for (int j=0;j<dim;j++)
-            {
-                System.out.print(grid[i][j]);
-                System.out.print("  ");
-            }
-            System.out.println();
-        }
-    }
-
     /*method to check if the number exist in the row or not*/
     private ArrayList<Integer> isInRow(int row)
     {
@@ -133,7 +119,7 @@ public class Grid {
         return colMissing;
     }
 
-    /*This ,method will return the arraylist of numbers which can be entered after checking the row and column*/
+    /*This method will return the arraylist of numbers which can be entered after checking the row and column*/
     private ArrayList<Integer> canEnter(int row, int col)
     {
        //all the remaining numbers in column and row will be collected using two methods
@@ -203,13 +189,11 @@ public class Grid {
                         //checking whether the values entered servers the constrain or not by calling the method
                         if(checkCurrentMatrix(matrix))
                         {
-
                             //copying the group and whole matrix if the value servers the constrain
                             int[][] temp = new int[dim][dim];
                             for(int r=0;r<dim;r++) {
                                 temp[r] = Arrays.copyOf(matrix[r], dim);
                             }
-
                             if(solveMathDoku(matrix)) {
                                 return true;
                             }
@@ -266,7 +250,6 @@ public class Grid {
                     {
                         break;
                     }
-
                     //switch will work according to the given operator of the group and will call the method accordingly
                     switch (operator)
                     { case '+':
