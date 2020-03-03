@@ -389,6 +389,10 @@ public class Mathdoku {
     int choices()
     {
         try{
+            if(!loadPuzzle)
+            {
+                return 0;
+            }
             return gd.counter;
         }
         catch (Exception e)

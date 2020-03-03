@@ -172,7 +172,6 @@ public class Grid {
         {
             return true;
         }
-
         for(int[] x:cellNumber)
         {
             int row=x[0];
